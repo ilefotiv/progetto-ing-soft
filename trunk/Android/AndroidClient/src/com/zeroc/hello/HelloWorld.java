@@ -180,7 +180,7 @@ public class HelloWorld extends Activity
         {
             if(!_deliveryMode.isBatch())
             {
-               /* if(hello.printString("vedi di funzionare porco dio"))
+               /* if(hello.printString("vedi di funzionare"))
                 {
                     if(_deliveryMode == DeliveryMode.TWOWAY || _deliveryMode == DeliveryMode.TWOWAY_SECURE)
                     {
@@ -194,14 +194,14 @@ public class HelloWorld extends Activity
                     _status.setText("Sending request");
                 }
                 */
-                hello.printString("vedi di funzionare porco dio");
+                hello.printString("vedi di funzionare");
             }
             else
             {
                 /*_flushButton.setEnabled(true);
                 hello.sayHello(_delay.getProgress());
                 _status.setText("Queued hello request");*/
-                hello.printString("vedi di funzionare porco dio");
+                hello.printString("vedi di funzionare");
             }
         }
         catch(Ice.LocalException ex)
