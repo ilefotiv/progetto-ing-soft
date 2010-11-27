@@ -1,7 +1,9 @@
 package com.zeroc.hello;
 
 import android.app.Application;
-
+// questa classe rappresenta l'applicazione, è il livello piu basso 
+// di gestione di un applicazione android e non fa va confusa con 
+// il concetto di activity
 public class HelloApp extends Application
 {
     interface CommunicatorCallback
