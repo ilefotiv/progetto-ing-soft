@@ -43,7 +43,7 @@ public class HelloWorld extends Activity
         DATAGRAM,
         DATAGRAM_BATCH;
 
-        // ritorna un proxie giusto a seconda del tipo scelto
+        // ritorna un proxie giusto a seconda del tipo di comunicazione scelto
         Ice.ObjectPrx apply(Ice.ObjectPrx prx)
         {
             switch (this)
@@ -81,7 +81,8 @@ public class HelloWorld extends Activity
             return this == ONEWAY_BATCH || this == DATAGRAM_BATCH || this == ONEWAY_SECURE_BATCH;
         }
     }
-
+    // ritorna il proxie di tipo printer specifico per l'oggetto
+    // che voglio condividere
     private Demo.PrinterPrx createProxy()
     {
         String host = _hostname.getText().toString().trim();
