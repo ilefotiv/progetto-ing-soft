@@ -32,6 +32,33 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 
 public class HelloWorld extends Activity
 {
+	private static final int DIALOG_INITIALIZING = 1;
+    private static final int DIALOG_ERROR = 2;
+    private static final int DIALOG_FATAL = 3;
+    
+    private static final String DEFAULT_HOST = "10.0.2.2";
+    private static final String HOSTNAME_KEY = "host";
+
+    private static final String BUNDLE_KEY_TIMEOUT = "zeroc:timeout";
+    private static final String BUNDLE_KEY_DELAY = "zeroc:delay";
+    private static final String BUNDLE_KEY_FLUSH_ENABLED = "zeroc:flush";
+    private static final String BUNDLE_KEY_LAST_ERROR = "zeroc:lastError";
+    
+    private Ice.Communicator _communicator = null;
+    private DeliveryMode _deliveryMode;
+
+    private Button _sayHelloButton;
+    private Button _shutdownButton;
+    private EditText _hostname;
+    private TextView _status;
+    private SeekBar _delay;
+    private SeekBar _timeout;
+    private ProgressBar _activity;
+    private SharedPreferences _prefs; // oggetto usato per gestire le preferenze tra diversi client
+    private Button _flushButton;
+    
+    private String _lastError = "";
+    
     enum DeliveryMode
     {
         TWOWAY,
@@ -86,26 +113,43 @@ public class HelloWorld extends Activity
     private Demo.PrinterPrx createProxy()
     {
         String host = _hostname.getText().toString().trim();
-        assert (host.length() > 0);
-        // Change the preferences if necessary.
+        assert (host.length() > 0); // un meccanismo tipico di java
+        // verifico se l'host di riferimento è diverso da quello 
+        // specificato
         if(!_prefs.getString(HOSTNAME_KEY, DEFAULT_HOST).equals(host))
         {
-            SharedPreferences.Editor edit = _prefs.edit();
+            SharedPreferences.Editor edit = _prefs.edit(); // cosi ottengo l'oggetto per modificare le preferenze
             edit.putString(HOSTNAME_KEY, host);
             edit.commit();
+            // grazie ha questo meccanismo di gestione delle preferenze
+            // è possibile condividere queste informazioni
+            // per tutte le richieste client che si sta cercando di effettuare
+            // non è possibile condivire però queste informaizoni tra piu processi
         }
-
+        
+        // stringa utilizzata per richiedere un particolare oggetto
+        // su un determintao host
         String s = "SimplePrinter:tcp -h " + host + " -p 10400";
+        // per richiedere un oggetto è necessario richiedere un proxie
+        // in questo modo ne istanzio uno, comunitor è l'oggetto Ice generico
+        // e il proxie richiederà l'adapter SimplePrinter che risiede 
+        // sull host specificato.
         Ice.ObjectPrx prx = _communicator.stringToProxy(s);
-        prx = _deliveryMode.apply(prx);
+        prx = _deliveryMode.apply(prx);// mi faccio tornare il proxie della tipologia voluta
         int timeout = _timeout.getProgress();
         if(timeout != 0)
         {
             prx = prx.ice_timeout(timeout);
         }
-        return Demo.PrinterPrxHelper.checkedCast(prx);
-    }
+        return Demo.PrinterPrxHelper.checkedCast(prx); // da questo punto in poi posso usare il
+        											   // un oggetto che implementa l'interfaccia
+        											   // specificata nel file .ice
+        // ricorda lato client bisogna richiedere un proxie per richiedere un oggetto
+        // successivamente grazie a NomeModulo.ClassPrxHelper si richiede un oggetto
+        // della class NomeModulo.Class
+     }
 
+    // metodi relativi all'interfaccia che era presente nell'esempio
     class SayHelloI extends Demo.AMI_Hello_sayHello implements Ice.AMISentCallback
     {
         private boolean _response = false;
@@ -177,31 +221,18 @@ public class HelloWorld extends Activity
     private void sayHello()
     {
         Demo.PrinterPrx hello = createProxy();
+        // hello implementa ora l'interfaccia printer specificata nei
+        // file slice
         try
         {
             if(!_deliveryMode.isBatch())
-            {
-               /* if(hello.printString("vedi di funzionare"))
-                {
-                    if(_deliveryMode == DeliveryMode.TWOWAY || _deliveryMode == DeliveryMode.TWOWAY_SECURE)
-                    {
-                        _activity.setVisibility(View.VISIBLE);
-                        _status.setText("Waiting for response");
-                    }
-                }
-                else
-                {
-                    _activity.setVisibility(View.VISIBLE);
-                    _status.setText("Sending request");
-                }
-                */
+            {  
+            	// uso effettivamente il metodo dell'oggetto condiviso
                 hello.printString("vedi di funzionare");
             }
             else
             {
-                /*_flushButton.setEnabled(true);
-                hello.sayHello(_delay.getProgress());
-                _status.setText("Queued hello request");*/
+            	// uso effettivamente il metodo dell'oggetto condiviso
                 hello.printString("vedi di funzionare");
             }
         }
@@ -585,31 +616,4 @@ public class HelloWorld extends Activity
 
         return null;
     }
-
-    private static final int DIALOG_INITIALIZING = 1;
-    private static final int DIALOG_ERROR = 2;
-    private static final int DIALOG_FATAL = 3;
-    
-    private static final String DEFAULT_HOST = "10.0.2.2";
-    private static final String HOSTNAME_KEY = "host";
-
-    private static final String BUNDLE_KEY_TIMEOUT = "zeroc:timeout";
-    private static final String BUNDLE_KEY_DELAY = "zeroc:delay";
-    private static final String BUNDLE_KEY_FLUSH_ENABLED = "zeroc:flush";
-    private static final String BUNDLE_KEY_LAST_ERROR = "zeroc:lastError";
-    
-    private Ice.Communicator _communicator = null;
-    private DeliveryMode _deliveryMode;
-
-    private Button _sayHelloButton;
-    private Button _shutdownButton;
-    private EditText _hostname;
-    private TextView _status;
-    private SeekBar _delay;
-    private SeekBar _timeout;
-    private ProgressBar _activity;
-    private SharedPreferences _prefs;
-    private Button _flushButton;
-    
-    private String _lastError = "";
 }
