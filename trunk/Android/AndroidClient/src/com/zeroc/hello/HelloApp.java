@@ -83,27 +83,9 @@ public class HelloApp extends Application
         try
         {
             Ice.Communicator communicator;
-            /*Ice.InitializationData initData = new Ice.InitializationData();
-            initData.properties = Ice.Util.createProperties();
-            initData.properties.setProperty("Ice.Trace.Network", "3");
-            initData.properties.setProperty("IceSSL.Trace.Security", "3");
-            initData.properties.setProperty("IceSSL.KeystoreType", "BKS");
-            initData.properties.setProperty("IceSSL.TruststoreType", "BKS");
-            initData.properties.setProperty("IceSSL.Password", "password");
-            initData.properties.setProperty("Ice.InitPlugins", "0");
-            initData.properties.setProperty("Ice.Plugin.IceSSL", "IceSSL.PluginFactory");*/
             communicator = Ice.Util.initialize();
 
-            //IceSSL.Plugin plugin = (IceSSL.Plugin)communicator.getPluginManager().getPlugin("IceSSL");
-            // Be sure to pass the same input stream to the SSL plug-in for
-            // both the keystore and the truststore. This makes startup a
-            // little faster since the plugin will not initialize
-            // two keystores.
-           /* java.io.InputStream certs = getResources().openRawResource(R.raw.certs); 
-            plugin.setKeystoreStream(certs);
-            plugin.setTruststoreStream(certs);
-
-            communicator.getPluginManager().initializePlugins();*/
+            
             
             synchronized(this)
             {
