@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Licensee: DuKe TeAm
+License Type: Purchased
+-->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="server.hibernate___foundation.ENota" table="`ENota`" lazy="false">
+		<id name="id" column="`Id`" type="integer" unsaved-value="0">
+			<generator class="native">
+			</generator>
+		</id>
+		<many-to-one name="scrittaDa" cascade="lock" column="`EUtenteId`" class="server.hibernate___foundation.EUtente" not-null="true" lazy="no-proxy">
+		</many-to-one>
+		<property name="content" column="`Content`" type="string" length="255" not-null="false" lazy="false"/>
+		<property name="data" column="`Data`" type="long" length="20" not-null="false" lazy="false"/>
+	</class>
+</hibernate-mapping>

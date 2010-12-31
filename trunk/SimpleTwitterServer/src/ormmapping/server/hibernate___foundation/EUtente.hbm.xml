@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!--
+Licensee: DuKe TeAm
+License Type: Purchased
+-->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+	<class name="server.hibernate___foundation.EUtente" table="`EUtente`" lazy="false">
+		<id name="id" column="`Id`" type="string">
+			<generator class="assigned">
+			</generator>
+		</id>
+		<property name="username" column="`Username`" type="string" length="255" not-null="false" lazy="false"/>
+		<set name="Inseguitore" table="`EUtente_EUtente`" lazy="true" cascade="save-update,lock" inverse="true">
+			<key column="`EUtenteId2`" not-null="true"/>
+			<many-to-many column="`EUtenteId`" class="server.hibernate___foundation.EUtente">
+			</many-to-many>
+		</set>
+		<set name="AutoreDi" lazy="true" cascade="save-update,lock" inverse="true">
+			<key column="`EUtenteId`" not-null="true"/>
+			<one-to-many class="server.hibernate___foundation.ENota"/>
+		</set>
+		<set name="Inseguito" table="`EUtente_EUtente`" lazy="true" cascade="save-update,lock">
+			<key column="`EUtenteId`" not-null="true"/>
+			<many-to-many column="`EUtenteId2`" class="server.hibernate___foundation.EUtente">
+			</many-to-many>
+		</set>
+	</class>
+</hibernate-mapping>
