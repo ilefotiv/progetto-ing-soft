@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Sun Dec 19 11:08:48 CET 2010
+onejar.license.required=true
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=C\:\\Users\\JEmlio\\Desktop\\SimpleTwitterServer.jar
+manifest.mergeall=true
+manifest.mainclass=Mains.Server
+manifest.file=<createnew>
+jarname.isextern=true
+onejar.expand=
+excludes=
+includes=

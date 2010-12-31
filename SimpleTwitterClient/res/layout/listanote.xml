@@ -1,0 +1,45 @@
+<RelativeLayout
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:background="@drawable/layout_background"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+		android:layout_marginBottom="24pt"
+	> 
+			<ListView
+			android:id="@id/android:list"
+			android:layout_width="fill_parent"
+			android:layout_height="wrap_content"
+			android:cacheColorHint="#00000000"
+			android:dividerHeight="2px"
+			android:divider="#458B00"
+		 	>
+			</ListView>
+	</LinearLayout>
+	<LinearLayout 
+		android:id="@+id/listaNote"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:layout_alignParentBottom="true"
+		android:background="@drawable/bg_bar">
+		<EditText
+			android:id="@+id/newNotaContent"
+			android:layout_weight="75"
+			android:layout_height="fill_parent"
+			android:layout_width="0px"
+			android:hint="aggiungi unanuova nota">
+		</EditText>
+		<ImageButton 
+			android:id="@+id/newNotaButton"
+			android:layout_weight="20"
+			android:layout_width="0px"
+			android:layout_height="wrap_content"
+			android:src="@drawable/send">
+		</ImageButton>
+	</LinearLayout>
+</RelativeLayout>

@@ -1,0 +1,12 @@
+ALTER TABLE `ENota` DROP FOREIGN KEY `autore`;
+ALTER TABLE `EUtente_EUtente` DROP FOREIGN KEY `segue`;
+ALTER TABLE `EUtente_EUtente` DROP FOREIGN KEY `segue2`;
+DROP TABLE IF EXISTS `ENota`;
+DROP TABLE IF EXISTS `EUtente`;
+DROP TABLE IF EXISTS `EUtente_EUtente`;
+CREATE TABLE `ENota` (`Id` int(11) NOT NULL AUTO_INCREMENT, `EUtenteId` varchar(255) NOT NULL, `Content` varchar(255), `Data` bigint(20), PRIMARY KEY (`Id`));
+CREATE TABLE `EUtente` (`Id` varchar(255) NOT NULL, `Username` varchar(255), PRIMARY KEY (`Id`));
+CREATE TABLE `EUtente_EUtente` (`EUtenteId` varchar(255) NOT NULL, `EUtenteId2` varchar(255) NOT NULL, PRIMARY KEY (`EUtenteId`, `EUtenteId2`));
+ALTER TABLE `ENota` ADD INDEX `autore` (`EUtenteId`), ADD CONSTRAINT `autore` FOREIGN KEY (`EUtenteId`) REFERENCES `EUtente` (`Id`);
+ALTER TABLE `EUtente_EUtente` ADD INDEX `segue` (`EUtenteId`), ADD CONSTRAINT `segue` FOREIGN KEY (`EUtenteId`) REFERENCES `EUtente` (`Id`);
+ALTER TABLE `EUtente_EUtente` ADD INDEX `segue2` (`EUtenteId2`), ADD CONSTRAINT `segue2` FOREIGN KEY (`EUtenteId2`) REFERENCES `EUtente` (`Id`);

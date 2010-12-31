@@ -1,0 +1,22 @@
+<RelativeLayout
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+android:background="@drawable/layout_background"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+	<LinearLayout
+		android:orientation="vertical"
+		android:layout_width="wrap_content"
+		android:layout_height="fill_parent"
+	> 
+			<ListView
+			android:id="@id/android:list"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:cacheColorHint="#00000000"
+			android:dividerHeight="2px"
+			android:divider="#458B00"
+		 	>
+			</ListView>
+	</LinearLayout>
+</RelativeLayout>
