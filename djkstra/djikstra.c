@@ -9,27 +9,22 @@
 //liste
 
 
-typedef struct node_key{
-	int node;
-	int key;
-}node_key;
-
 
 typedef struct list {
 	struct list* next;
-	int elem;
-	int key;
+	int node;
+	int dist;
 } list;
 
-list* add_elem(list* list_in, int elem_in, int key_in) {
+list* add_node(list* list_in, int node_in, int dist_in) {
 		list* list_out=(list*)malloc(sizeof(list));
 		list_out->next=list_in;
-		list_out->elem=elem_in;
-		list_out->key=key_in;
+		list_out->node=node_in;
+		list_out->dist=dist_in;
 		return list_out;
 }
 
-list* delete_elem(list* list_in){
+list* delete_node(list* list_in){
 	list* list_out=list_in->next;
 	free(list_in);
 	return list_out;
@@ -56,8 +51,8 @@ adj_list* new_adj_list(int num_nodes){
 }
 
 void add_edge_und(adj_list* adj_list_in, int i,int j, int w){
-	adj_list_in->node[i]=add_elem(adj_list_in->node[i],j,w);
-	adj_list_in->node[j]=add_elem(adj_list_in->node[j],i,w);
+	adj_list_in->node[i]=add_node(adj_list_in->node[i],j,w);
+	adj_list_in->node[j]=add_node(adj_list_in->node[j],i,w);
 	adj_list_in->num_edges++;
 }
 
@@ -66,7 +61,7 @@ void delete_adj_list(adj_list* adj_list_in){
 	for(i=0;i<adj_list_in->num_nodes;i++){
 		p=adj_list_in->node[i];
 		while(p!=NULL){
-			p=delete_elem(p);
+			p=delete_node(p);
 		}
 	}
 	free(adj_list_in->node);
@@ -84,7 +79,7 @@ void print_adj_list(adj_list* adj_list_in){
 		p=adj_list_in->node[i];
 		printf("%d->[",i);
 		while(p!=NULL){
-			printf("(%d,%d) ",p->elem,p->key);
+			printf("(%d,%d) ",p->node,p->dist);
 			p=p->next;
 		}
 		printf("] \n");
@@ -141,62 +136,62 @@ adj_list* new_unif_graph(int num_nodes,int num_edges,edge* edge_in,int max_value
 
 //d_heap
 
-typedef struct elem_key{
-	int elem;//restituisce il nodo in posizione sort
-	int key;//restituisce la chiave a partire dalla posizione nell'heap del nodo
-	int sort;//restituisce la posizione nell'heap del nodo elem
-}elem_key;
+typedef struct node_dist{
+	int node;//restituisce il nodo in posizione sort
+	int dist;//restituisce la chiave a partire dalla posizione nell'heap del nodo
+	int sort;//restituisce la posizione nell'heap del nodo node
+}node_dist;
 
 typedef struct heap{
-	elem_key* ek;
+	node_dist* ek;
 	int num_nodes;
 	int num_sons;
 } heap;
 
-void sweep(elem_key* elem_key_in, int sort1,int sort2){
+void sweep(node_dist* node_dist_in, int sort1,int sort2){
 	int sr, k; int el;
-	el=elem_key_in[sort2].elem;
-	elem_key_in[sort2].elem=elem_key_in[sort1].elem;
-	elem_key_in[sort1].elem=el;
-	k=elem_key_in[sort2].key;
-	elem_key_in[sort2].key=elem_key_in[sort1].key;
-	elem_key_in[sort1].key=k;
-	sr=elem_key_in[sort1].elem;
-	elem_key_in[sr].sort=sort1;
-	sr=elem_key_in[sort2].elem;
-	elem_key_in[sr].sort=sort2;
+	el=node_dist_in[sort2].node;
+	node_dist_in[sort2].node=node_dist_in[sort1].node;
+	node_dist_in[sort1].node=el;
+	k=node_dist_in[sort2].dist;
+	node_dist_in[sort2].dist=node_dist_in[sort1].dist;
+	node_dist_in[sort1].dist=k;
+	sr=node_dist_in[sort1].node;
+	node_dist_in[sr].sort=sort1;
+	sr=node_dist_in[sort2].node;
+	node_dist_in[sr].sort=sort2;
 }
 
 heap* new_heap(adj_list* adj_list_in,int source,int num_sons){
-	heap* heap_out; elem_key* elem_key_in; int i,num_nodes=adj_list_in->num_nodes;
+	heap* heap_out; node_dist* node_dist_in; int i,num_nodes=adj_list_in->num_nodes;
 	heap_out=(heap*)malloc(sizeof(heap));
 	heap_out->num_sons=num_sons;
 	heap_out->num_nodes=num_nodes;
-	heap_out->ek=(elem_key*)malloc((num_nodes)*sizeof(elem_key));
-	elem_key_in=heap_out->ek;
+	heap_out->ek=(node_dist*)malloc((num_nodes)*sizeof(node_dist));
+	node_dist_in=heap_out->ek;
 	for (i=0;i<num_nodes;i++){
-		elem_key_in[i].elem=i;
-		elem_key_in[i].sort=i;
-		elem_key_in[i].key=INT_MAX;
+		node_dist_in[i].node=i;
+		node_dist_in[i].sort=i;
+		node_dist_in[i].dist=INT_MAX;
 	}
-	sweep(elem_key_in,0,heap_out->ek[source].sort);
-	elem_key_in[0].key=0;
+	sweep(node_dist_in,0,heap_out->ek[source].sort);
+	node_dist_in[0].dist=0;
 	return heap_out;
 }
 
 
 
-bool decrease_key(heap* heap_in, int elem_in,int key_in){
-	int sort1,sort2,num_sons;elem_key* elem_key_in;
-	elem_key_in=heap_in->ek;
+bool decrease_dist(heap* heap_in, int node_in,int dist_in){
+	int sort1,sort2,num_sons;node_dist* node_dist_in;
+	node_dist_in=heap_in->ek;
 	num_sons=heap_in->num_sons;
-	sort1=elem_key_in[elem_in].sort;
-	if (key_in<elem_key_in[sort1].key){
-		heap_in->ek[sort1].key=key_in;
+	sort1=node_dist_in[node_in].sort;
+	if (dist_in<node_dist_in[sort1].dist){
+		heap_in->ek[sort1].dist=dist_in;
 		sort2=sort1;
 		sort1=(sort2-1)/num_sons;
-		while(elem_key_in[sort1].key>elem_key_in[sort2].key && sort2>0){
-			sweep(elem_key_in,sort1,sort2);
+		while(node_dist_in[sort1].dist>node_dist_in[sort2].dist && sort2>0){
+			sweep(node_dist_in,sort1,sort2);
 			sort2=sort1;
 			sort1=(sort2-1)/num_sons;
 		}
@@ -214,34 +209,34 @@ bool empty_heap(heap* heap_in){
 
 void print_heap(heap* heap_in){
 	int i;
-	for (i=0;i<heap_in->num_nodes;i++) printf("(%d,%d,%d)",heap_in->ek[i].elem,heap_in->ek[i].key,heap_in->ek[i].sort);
+	for (i=0;i<heap_in->num_nodes;i++) printf("(%d,%d,%d)",heap_in->ek[i].node,heap_in->ek[i].dist,heap_in->ek[i].sort);
 	printf("\n");
 }
 
 
-node_key extract_min(heap* heap_in){
-	node_key node_key_out;int sort1=0, sort2, i,first_son1, last_son1, num_sons=heap_in->num_sons;
-	elem_key* elem_key_in=heap_in->ek;
+node_dist extract_min(heap* heap_in){
+	node_dist node_dist_out;int sort1=0, sort2, i,first_son1, last_son1, num_sons=heap_in->num_sons;
+	node_dist* node_dist_in=heap_in->ek;
 	int num_nodes=heap_in->num_nodes;
-	node_key_out.node=heap_in->ek[0].elem;
-	node_key_out.key=heap_in->ek[0].key;
+	node_dist_out.node=heap_in->ek[0].node;
+	node_dist_out.dist=heap_in->ek[0].dist;
 	first_son1=1;
 	while(first_son1<num_nodes){
 		sort2=first_son1;
 		if(first_son1+num_sons<num_nodes) last_son1=first_son1+num_sons;
 		else last_son1=num_nodes;
 		for(i=first_son1+1;i<last_son1;i++){
-			if (elem_key_in[i].key<elem_key_in[sort2].key){
+			if (node_dist_in[i].dist<node_dist_in[sort2].dist){
 				sort2=i;
 			}
 		}
-		sweep(elem_key_in,sort1,sort2);
+		sweep(node_dist_in,sort1,sort2);
 		sort1=sort2;
 		first_son1=sort1*num_sons+1;
 	}
-	sweep(elem_key_in,sort1,num_nodes-1);
+	sweep(node_dist_in,sort1,num_nodes-1);
 	heap_in->num_nodes--;
-	return node_key_out;
+	return node_dist_out;
 }
 
 
@@ -251,9 +246,9 @@ node_key extract_min(heap* heap_in){
 void connected(adj_list* adj_list_in, int source, int* reach){
 	list* node=adj_list_in->node[source]->next;
 	while (node!=NULL){
-		if(reach[node->elem]==0) {
-		reach[node->elem]=1;
-		connected(adj_list_in,node->elem,reach);
+		if(reach[node->node]==0) {
+		reach[node->node]=1;
+		connected(adj_list_in,node->node,reach);
 		}
 		node=node->next;
 	}
@@ -280,18 +275,18 @@ typedef struct dist_pred{
 } dist_pred;
 
 dist_pred* dijkstra(adj_list* adj_list_in, int source) {
-	int num_nodes; node_key node_key_out; dist_pred* dist_pred_out; heap* heap_in;list* list_in;
+	int num_nodes; node_dist node_dist_out; dist_pred* dist_pred_out; heap* heap_in;list* list_in;
 	num_nodes=adj_list_in->num_nodes;
 	dist_pred_out=(dist_pred*)malloc(num_nodes*sizeof(dist_pred));
 	heap_in=new_heap(adj_list_in,source,2);
 	dist_pred_out[source].pred=source;
 	while(!empty_heap(heap_in)){
-		node_key_out=extract_min(heap_in);
-		dist_pred_out[node_key_out.node].dist=node_key_out.key;
-		list_in=adj_list_in->node[node_key_out.node];
+		node_dist_out=extract_min(heap_in);
+		dist_pred_out[node_dist_out.node].dist=node_dist_out.dist;
+		list_in=adj_list_in->node[node_dist_out.node];
 		while(list_in!=NULL){
-			if (decrease_key(heap_in,list_in->elem,node_key_out.key+(list_in->key)))
-				dist_pred_out[list_in->elem].pred=node_key_out.node;
+			if (decrease_dist(heap_in,list_in->node,node_dist_out.dist+(list_in->dist)))
+				dist_pred_out[list_in->node].pred=node_dist_out.node;
 			list_in=list_in->next;
 		}
 	}
@@ -310,7 +305,7 @@ void print_dist_pred(adj_list* adj_list_in, int source){
 //main
 
 int main(void)  {
-adj_list* graph ;edge* arr; int* d; heap* heap_in; node_key node_key_out;
+adj_list* graph ;edge* arr; int* d; heap* heap_in; node_dist node_dist_out;
 	srand(time(NULL));
 	graph=new_erdos_graph(0.5,6,4);
 	print_adj_list(graph);
