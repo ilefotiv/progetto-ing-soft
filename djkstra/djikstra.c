@@ -5,6 +5,8 @@
 #include <math.h>
 #include <time.h>
 #include <stdbool.h>
+#include "fibonacciHeap.h"
+#include <stdbool.h>
 
 //liste
 
@@ -302,16 +304,29 @@ void print_dist_pred(adj_list* adj_list_in, int source){
 	}
 }
 
-//main
+/*
+ * costruuisce l'heap a partire dalle liste di adiacenza
+ */
+void BUILD_HEAP(fibHeap * h, adj_list* graph){
+	int i;list* p;
+	for(i=0;i<graph->num_nodes;i++){
+		fibNode * x=GetNewNode(i,INFINITY_VALUE);
+		FIB_HEAP_INSERT(h,x);
+	}
+}
 
 int main(void)  {
-adj_list* graph ;edge* arr; int* d; heap* heap_in; node_dist node_dist_out;
+	fibHeap * h= MAKE_FIB_HEAP();
+	adj_list* graph;
 	srand(time(NULL));
-	graph=new_erdos_graph(0.5,6,4);
+	graph=new_erdos_graph(0.2,10,4);
 	print_adj_list(graph);
 	print_dist_pred(graph,0);
 	delete_adj_list(graph);
+	BUILD_HEAP(h,graph);
+	Print(h);
+	FIB_HEAP_EXTRACT_MINN(h);
+	Print(h);
 	return 0;
 }
-
 
