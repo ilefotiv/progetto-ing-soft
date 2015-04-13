@@ -213,7 +213,8 @@ node_dist fib_extract_min(fibHeap *h) {
 		} else
 			h->min = NULL;
 		h->n--;
-		CONSOLIDATE(h);
+		if(h->n!=0)
+			CONSOLIDATE(h);
 	}
 	out.node=z->data;
 	out.dist=z->key;
@@ -335,6 +336,7 @@ bool fib_empty_heap(fibHeap * h){
 			free(h->dict[i]);
 		}
 		free(h->dict);
+		free(h);
 		return true;
 	}else
 		return false;

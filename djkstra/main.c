@@ -9,14 +9,19 @@
 #include "fibonacciHeap.h"
 #include "dijkstra.h"
 
-int main(void)  {
+int main(void) {
 	adj_list* graph;
 	srand(time(NULL));
-	graph=new_erdos_graph(0.1,10,4,false);
+	graph = new_erdos_graph(0.1, 3, 4, false);
 	print_adj_list(graph);
 	print_dist_pred(graph, 0);
-	//print_dist_pred(graph,3);
-	//delete_adj_list(graph);
+	print_dist_pred(graph,3);
 	delete_adj_list(graph);
+	//fibHeap * h = fib_new_heap(graph, 3);
+	/*while (!fib_empty_heap(h)) {
+		printf("minimo %d \n", fib_extract_min(h).node);
+		SerializeFib(h->min);
+		printf("\n");
+	}*/
 	return 0;
 }
