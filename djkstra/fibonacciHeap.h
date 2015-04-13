@@ -7,6 +7,7 @@
 /*
  * structure of the generic fibanacci heap node
  */
+
 typedef struct fibNode {
 	// id of the element in the heap
 	int data;
