@@ -42,6 +42,8 @@ typedef struct fibHeap {
 	fibNode * min;
 	// number of node in the heap
 	int n;
+	//lista ausiliaria per memorizzare i puntatori ai nodi
+	fibNode ** dict;
 } fibHeap;
 
 const int INFINITY_VALUE = 200000;
@@ -57,7 +59,7 @@ fibNode* GetNewNode(int id, int key) {
 	newNode->child = NULL;
 	newNode->marked = false;
 	newNode->parent = NULL;
-	newNode->consolidated=false;
+	newNode->consolidated = false;
 	return newNode;
 }
 
@@ -113,69 +115,68 @@ void FIB_HEAP_LINK(fibHeap * h, fibNode * y, fibNode * x) {
 		y->left->right = y;
 		y->right = x->child;
 		x->child->left = y;
-	}else{
-		y->left=y;
-		y->right=y;
-		x->child=y;
+	} else {
+		y->left = y;
+		y->right = y;
+		x->child = y;
 	}
 	//3 y:mark D FALSE e consolidato a false
-	y->marked=false;
-	y->consolidated=false;
+	y->marked = false;
+	y->consolidated = false;
 }
 
 //funzione che consolida la struttura dell'heap
 void CONSOLIDATE(fibHeap *h) {
-	int arraySize=((int)(log(h->n)/log(2)))+1;
+	int arraySize = ((int) (log(h->n) / log(2))) + 1;
 	//dichiaro il nuvo array con lunghezza al massimo log(n)
-	fibNode ** A=(fibNode**)malloc(arraySize*sizeof(fibNode*));
-	for(int i=0; i<arraySize; i++){
-		A[i]=NULL;
+	fibNode ** A = (fibNode**) malloc(arraySize * sizeof(fibNode*));
+	for (int i = 0; i < arraySize; i++) {
+		A[i] = NULL;
 	}
 	//per ogni nodo nella rootList
-	fibNode * w=h->min;
+	fibNode * w = h->min;
 	//memorizzo il grado della radice che consolido
-	int d=0;
-	fibNode * x=NULL;
-	fibNode * y=NULL;
-	fibNode * t=NULL;
-	while(w->consolidated==false){
-		w->consolidated=true;
+	int d = 0;
+	fibNode * x = NULL;
+	fibNode * y = NULL;
+	fibNode * t = NULL;
+	while (w->consolidated == false) {
+		w->consolidated = true;
 		//printf("consolido radice %d \n",w->data);
 		//printf("grado radice %d \n",w->degree);
-		x=w;
-		d=x->degree;
-		while(A[d] != NULL)
-		{
-			y=A[d];// another node with the same degree as x
-			if(x->key > y->key){
+		x = w;
+		d = x->degree;
+		while (A[d] != NULL) {
+			y = A[d];		// another node with the same degree as x
+			if (x->key > y->key) {
 				//10 exchange x with y
-				t=x;
-				x=y;
-				y=t;
+				t = x;
+				x = y;
+				y = t;
 			}
 			//printf("nodo %d diventa figlio di nodo %d \n", y->data, x->data);
-			FIB_HEAP_LINK(h,y,x);
-			A[d]=NULL;
+			FIB_HEAP_LINK(h, y, x);
+			A[d] = NULL;
 			d++;
 		}
-		A[d]=x;
-		w=x->right;
+		A[d] = x;
+		w = x->right;
 	}
-	h->min=NULL;
+	h->min = NULL;
 	//ricreo l'heap a partire dall'array A
-	for(int i=0; i<arraySize; i++){
-		if(A[i]!= NULL){
-			A[i]->consolidated=false;
-			if(h->min==NULL){
-				A[i]->parent=NULL;
-				A[i]->left=A[i];
-				A[i]->right=A[i];
-				h->min=A[i];
-			}else{
+	for (int i = 0; i < arraySize; i++) {
+		if (A[i] != NULL) {
+			A[i]->consolidated = false;
+			if (h->min == NULL) {
+				A[i]->parent = NULL;
+				A[i]->left = A[i];
+				A[i]->right = A[i];
+				h->min = A[i];
+			} else {
 				//printf("muovo il nodo %d nella lista delle radici", A[i]->data);
-				MOVE_NODE_TO_THEROOT(h,A[i]);
-				if(A[i]->key < h->min->key)
-					h->min=A[i];
+				MOVE_NODE_TO_THEROOT(h, A[i]);
+				if (A[i]->key < h->min->key)
+					h->min = A[i];
 			}
 		}
 	}
@@ -184,7 +185,7 @@ void CONSOLIDATE(fibHeap *h) {
 // deletes the element from heap H whose key is minimum,
 // returning a pointer to the element.
 // consolidate the heap structure
-fibNode * FIB_HEAP_EXTRACT_MINN(fibHeap *h,bool cons) {
+fibNode * FIB_HEAP_EXTRACT_MINN(fibHeap *h, bool cons) {
 	fibNode * z = h->min;
 	if (z != NULL) {
 		if (z->child != NULL) {
@@ -210,7 +211,7 @@ fibNode * FIB_HEAP_EXTRACT_MINN(fibHeap *h,bool cons) {
 		} else
 			h->min = NULL;
 		h->n--;
-		if(cons==true)
+		if (cons == true)
 			CONSOLIDATE(h);
 	}
 	return z;
@@ -223,10 +224,64 @@ fibHeap * UNION(fibHeap * h1, fibHeap * h2) {
 	//not implemented because useless for our application
 	return NULL;
 }
+
+//REMOVE THE NODE X FROM THE CHILD LIST OF Y
+void CUT(fibHeap * h, fibNode * x) {
+	/*remove x from the child list of y, decrementing y:degree
+	 2 add x to the root list of H*/
+	fibNode * p = x->parent;
+	//caso in cui x è il figlio puntato da child
+	if (p->child == x) {
+		if (x->right == x) {
+			if (x->left == x) {
+				p->child = NULL;
+			} else {
+				p->child = x->left;
+			}
+		} else {
+			p->child = x->right;
+		}
+	}
+	x->parent->degree--;
+	x->parent = NULL;
+	//collego i suoi fratelli
+	x->right->left=x->left;
+	x->left->right=x->right;
+	//lo inserisco nella lista delle radici
+	x->left = h->min->left;
+	x->left->right = x;
+	h->min->left = x;
+	x->right = h->min;
+	x->marked = false;
+}
+
+void CASCADING_CUT(fibHeap * h, fibNode * y) {
+	fibNode * z= y->parent;
+	if(z!=NULL){
+		if(y->marked==false){
+			y->marked=true;
+		}else{
+			CUT(h,y);
+			CASCADING_CUT(h,z);
+		}
+	}
+}
+
 // assigns to element x within heap H the new key value k, which we
 // assume to be no greater than its current key value.
-fibHeap * DECREASE_KEY(fibHeap * h, fibNode * x, int k) {
-	return NULL;
+bool DECREASE_KEY(fibHeap * h, fibNode * x, int k) {
+	fibNode * p = NULL;
+	if (k > x->key)
+		return false;
+	x->key = k;
+	p = x->parent;
+	if (p != NULL && x->key < p->key) {
+		CUT(h, x);
+		CASCADING_CUT(h, p);
+	}
+	if (x->key < h->min->key)
+		h->min = x;
+	return true;
 }
 
 // deletes element x from heap H.
