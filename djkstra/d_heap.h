@@ -34,7 +34,7 @@ void sweep(d_node_dist* d_node_dist_in, int sort1,int sort2){
 
 //crea un d-d_heap a partire dalla lista di adiacenza con numero di figli pari al rapporto fra archi e nodi
 
-d_heap* new_d_heap(adj_list* adj_list_in,int source){
+d_heap* new_heap(adj_list* adj_list_in,int source){
 	d_heap* d_heap_out; d_node_dist* d_node_dist_in; int i,num_nodes=adj_list_in->num_nodes;
 	d_heap_out=(d_heap*)malloc(sizeof(d_heap));
 	d_heap_out->num_children=adj_list_in->num_edges/num_nodes+1;
