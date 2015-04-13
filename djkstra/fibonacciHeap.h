@@ -30,6 +30,8 @@ typedef struct fibNode {
 	//indicates whethernode x has lost a child since
 	//the last time x was made the child of another node
 	bool marked;
+	//indica se il nodo è stato scandito nella lista (aggiunta all'algoritmo)
+	bool consolidated;
 } fibNode;
 
 /*
@@ -55,6 +57,7 @@ fibNode* GetNewNode(int id, int key) {
 	newNode->child = NULL;
 	newNode->marked = false;
 	newNode->parent = NULL;
+	newNode->consolidated=false;
 	return newNode;
 }
 
@@ -97,38 +100,106 @@ void MOVE_NODE_TO_THEROOT(fibHeap * h, fibNode * x) {
 fibNode * MINIMUM(fibHeap * h) {
 	return h->min;
 }
+//rende y figlio di x nell'heap h
+void FIB_HEAP_LINK(fibHeap * h, fibNode * y, fibNode * x) {
+	//1 remove y from the root list of H
+	y->left->right = y->right;
+	y->right->left = y->left;
+	//2 make y a child of x, incrementing x:degree
+	y->parent = x;
+	x->degree++;
+	if (x->child != NULL) {
+		y->left = x->child->left;
+		y->left->right = y;
+		y->right = x->child;
+		x->child->left = y;
+	}else{
+		y->left=y;
+		y->right=y;
+		x->child=y;
+	}
+	//3 y:mark D FALSE e consolidato a false
+	y->marked=false;
+	y->consolidated=false;
+}
+
 //funzione che consolida la struttura dell'heap
 void CONSOLIDATE(fibHeap *h) {
+	int arraySize=((int)(log(h->n)/log(2)))+1;
+	//dichiaro il nuvo array con lunghezza al massimo log(n)
+	fibNode ** A=(fibNode**)malloc(arraySize*sizeof(fibNode*));
+	for(int i=0; i<arraySize; i++){
+		A[i]=NULL;
+	}
+	//per ogni nodo nella rootList
+	fibNode * w=h->min;
+	//memorizzo il grado della radice che consolido
+	int d=0;
+	fibNode * x=NULL;
+	fibNode * y=NULL;
+	fibNode * t=NULL;
+	while(w->consolidated==false){
+		w->consolidated=true;
+		//printf("consolido radice %d \n",w->data);
+		//printf("grado radice %d \n",w->degree);
+		x=w;
+		d=x->degree;
+		while(A[d] != NULL)
+		{
+			y=A[d];// another node with the same degree as x
+			if(x->key > y->key){
+				//10 exchange x with y
+				t=x;
+				x=y;
+				y=t;
+			}
+			//printf("nodo %d diventa figlio di nodo %d \n", y->data, x->data);
+			FIB_HEAP_LINK(h,y,x);
+			A[d]=NULL;
+			d++;
+		}
+		A[d]=x;
+		w=x->right;
+	}
+	h->min=NULL;
+	//ricreo l'heap a partire dall'array A
+	for(int i=0; i<arraySize; i++){
+		if(A[i]!= NULL){
+			A[i]->consolidated=false;
+			if(h->min==NULL){
+				A[i]->parent=NULL;
+				A[i]->left=A[i];
+				A[i]->right=A[i];
+				h->min=A[i];
+			}else{
+				//printf("muovo il nodo %d nella lista delle radici", A[i]->data);
+				MOVE_NODE_TO_THEROOT(h,A[i]);
+				if(A[i]->key < h->min->key)
+					h->min=A[i];
+			}
+		}
+	}
 
 }
 // deletes the element from heap H whose key is minimum,
 // returning a pointer to the element.
 // consolidate the heap structure
-fibNode * FIB_HEAP_EXTRACT_MINN(fibHeap *h) {
+fibNode * FIB_HEAP_EXTRACT_MINN(fibHeap *h,bool cons) {
 	fibNode * z = h->min;
 	if (z != NULL) {
 		if (z->child != NULL) {
 			//add the child of z as new root in the root list
-			fibNode * tempRChild = z->child;
-			fibNode * tempLChild = z->child->left;
+			fibNode * tempChild = z->child->right;
 			fibNode * x;
+			MOVE_NODE_TO_THEROOT(h, z->child);
 			//scandisco i figli sulla destra
-			while (tempRChild != NULL) {
+			while (tempChild != z->child) {
 				//x è il nodo da aggiungere alla lista
-				x = tempRChild;
+				x = tempChild;
+				tempChild = tempChild->right;
 				//aggiungo x alla root list
 				MOVE_NODE_TO_THEROOT(h, x);
 				//scandisco la lista a destra
-				tempRChild = tempRChild->right;
-			}
-			//scandisco i figli sullla sinistra
-			while (tempLChild != NULL) {
-				//x è il nodo da aggiungere alla lista
-				x = tempLChild;
-				//aggiungo x alla root list
-				MOVE_NODE_TO_THEROOT(h, x);
-				//scandisco la lista a destra
-				tempLChild = tempLChild->left;
 			}
 		}
 		//rimuovo z dalla lista
@@ -138,8 +209,9 @@ fibNode * FIB_HEAP_EXTRACT_MINN(fibHeap *h) {
 			h->min = z->right;
 		} else
 			h->min = NULL;
-		CONSOLIDATE(h);
 		h->n--;
+		if(cons==true)
+			CONSOLIDATE(h);
 	}
 	return z;
 }
@@ -162,24 +234,21 @@ fibHeap * DELETE(fibHeap * h, fibNode *x) {
 	return NULL;
 }
 
-
 //Prints all the elements in linked list in forward traversal order
-void Print(fibHeap * h) {
-	if (h->min != NULL) {
-		printf("Heap: ");
-		printf("%d ",h->min->data);
-		fibNode* temp = h->min->left;
-		while(temp!=h->min){
-			printf("%d ",temp->data);
-			temp=temp->left;
-
+void SerializeFib(fibNode * min) {
+	if (min != NULL) {
+		printf("{ %d ", min->data);
+		SerializeFib(min->child);
+		printf("}");
+		fibNode* temp = min->left;
+		while (temp != min) {
+			printf("{ %d ", temp->data);
+			SerializeFib(temp->child);
+			printf("}");
+			temp = temp->left;
 		}
-		printf("\n");
-	}else
-		printf("heap vuoto ");
-
+	}
 }
-
 
 //int main() {
 //	fibHeap * h= MAKE_FIB_HEAP();
