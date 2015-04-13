@@ -1,4 +1,4 @@
-#include <stdio.h>
+/*#include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
 #include <math.h>
@@ -325,7 +325,7 @@ void print_dist_pred(adj_list* adj_list_in, int source) {
 /*
  * costruuisce l'heap a partire dalle liste di adiacenza
  */
-void BUILD_HEAP(fibHeap * h, adj_list* graph) {
+/*void BUILD_HEAP(fibHeap * h, adj_list* graph) {
 	int i;
 	//inizializzo la lista dei nodi
 	h->dict = (fibNode **) malloc(graph->num_nodes * sizeof(fibNode));
@@ -394,4 +394,4 @@ int main(void) {
 		} else
 	printf("heap vuoto");
 	return 0;
-}
+}*/

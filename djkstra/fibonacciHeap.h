@@ -7,6 +7,9 @@
 /*
  * structure of the generic fibanacci heap node
  */
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 
 typedef struct fibNode {
 	// id of the element in the heap
@@ -40,6 +43,8 @@ typedef struct fibHeap {
 	int n;
 	//lista ausiliaria per memorizzare i puntatori ai nodi
 	fibNode ** dict;
+	//dimensione della lista nodi
+	int numNode;
 } fibHeap;
 
 const int INFINITY_VALUE = 200000;
@@ -181,7 +186,7 @@ void CONSOLIDATE(fibHeap *h) {
 // deletes the element from heap H whose key is minimum,
 // returning a pointer to the element.
 // consolidate the heap structure
-node_dist * extract_min(fibHeap *h) {
+node_dist fib_extract_min(fibHeap *h) {
 	node_dist out;
 	fibNode * z = h->min;
 	if (z != NULL) {
@@ -267,9 +272,9 @@ void CASCADING_CUT(fibHeap * h, fibNode * y) {
 
 // assigns to element x within heap H the new key value k, which we
 // assume to be no greater than its current key value.
-bool decrease_dist(fibHeap * h, int node, int k) {
+bool fib_decrease_dist(fibHeap * h, int node, int k) {
 	fibNode * p = NULL;
-	fibNode * x = h.dict[node];
+	fibNode * x = h->dict[node];
 	if (k > x->key)
 		return false;
 	x->key = k;
@@ -302,6 +307,36 @@ void SerializeFib(fibNode * min) {
 			temp = temp->left;
 		}
 	}
+}
+
+fibHeap * fib_new_heap(adj_list* graph,int source) {
+	fibHeap * h=MAKE_FIB_HEAP();
+	int key;
+	//inizializzo la lista dei nodi
+	h->numNode=graph->num_nodes;
+	h->dict = (fibNode **) malloc(h->numNode * sizeof(fibNode));
+	for (int i = 0; i < graph->num_nodes; i++) {
+		if(i==source){
+			key=0;
+		}else{
+			key=INFINITY_VALUE;
+		}
+		fibNode * x = GetNewNode(i, key);
+		//inserisco il nodo i nella posizione i della lista
+		h->dict[i] = x;
+		FIB_HEAP_INSERT(h, x);
+	}
+	return h;
+}
+
+bool fib_empty_heap(fibHeap * h){
+	if(h->n==0){
+		for(int i=0; i<h->numNode; i++){
+			free(h->dict[i]);
+		}
+		return true;
+	}else
+		return false;
 }
 
 //int main() {

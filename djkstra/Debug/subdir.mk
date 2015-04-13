@@ -4,13 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
-../djikstra.c 
+../main.c \
+../tem.c 
 
 OBJS += \
-./djikstra.o 
+./main.o \
+./tem.o 
 
 C_DEPS += \
-./djikstra.d 
+./main.d \
+./tem.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
