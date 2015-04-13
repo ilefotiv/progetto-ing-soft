@@ -4,11 +4,6 @@
  *  Created on: 12/apr/2015
  *      Author: emilio-gssi
  */
-/* Doubly Linked List implementation */
-#include<stdio.h>
-#include<stdlib.h>
-#include <stdbool.h>
-
 /*
  * structure of the generic fibanacci heap node
  */
@@ -147,7 +142,7 @@ void CONSOLIDATE(fibHeap *h) {
 		x = w;
 		d = x->degree;
 		while (A[d] != NULL) {
-			y = A[d];		// another node with the same degree as x
+			y = A[d]; // another node with the same degree as x
 			if (x->key > y->key) {
 				//10 exchange x with y
 				t = x;
@@ -185,7 +180,8 @@ void CONSOLIDATE(fibHeap *h) {
 // deletes the element from heap H whose key is minimum,
 // returning a pointer to the element.
 // consolidate the heap structure
-fibNode * FIB_HEAP_EXTRACT_MINN(fibHeap *h, bool cons) {
+node_dist * extract_min(fibHeap *h) {
+	node_dist out;
 	fibNode * z = h->min;
 	if (z != NULL) {
 		if (z->child != NULL) {
@@ -211,10 +207,11 @@ fibNode * FIB_HEAP_EXTRACT_MINN(fibHeap *h, bool cons) {
 		} else
 			h->min = NULL;
 		h->n--;
-		if (cons == true)
-			CONSOLIDATE(h);
+		CONSOLIDATE(h);
 	}
-	return z;
+	out.node=z->data;
+	out.dist=z->key;
+	return out;
 }
 /*
  * creates and returns a new heap that contains all the elements of
@@ -245,8 +242,8 @@ void CUT(fibHeap * h, fibNode * x) {
 	x->parent->degree--;
 	x->parent = NULL;
 	//collego i suoi fratelli
-	x->right->left=x->left;
-	x->left->right=x->right;
+	x->right->left = x->left;
+	x->left->right = x->right;
 	//lo inserisco nella lista delle radici
 	x->left = h->min->left;
 	x->left->right = x;
@@ -256,21 +253,22 @@ void CUT(fibHeap * h, fibNode * x) {
 }
 
 void CASCADING_CUT(fibHeap * h, fibNode * y) {
-	fibNode * z= y->parent;
-	if(z!=NULL){
-		if(y->marked==false){
-			y->marked=true;
-		}else{
-			CUT(h,y);
-			CASCADING_CUT(h,z);
+	fibNode * z = y->parent;
+	if (z != NULL) {
+		if (y->marked == false) {
+			y->marked = true;
+		} else {
+			CUT(h, y);
+			CASCADING_CUT(h, z);
 		}
 	}
 }
 
 // assigns to element x within heap H the new key value k, which we
 // assume to be no greater than its current key value.
-bool DECREASE_KEY(fibHeap * h, fibNode * x, int k) {
+bool decrease_dist(fibHeap * h, int node, int k) {
 	fibNode * p = NULL;
+	fibNode * x = h.dict[node];
 	if (k > x->key)
 		return false;
 	x->key = k;
