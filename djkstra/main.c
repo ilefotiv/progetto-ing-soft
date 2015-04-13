@@ -12,10 +12,9 @@
 int main(void) {
 	adj_list* graph;
 	srand(time(NULL));
-	graph = new_erdos_graph(0.1, 3, 4, false);
+	graph = new_erdos_graph(0.6, 10, 4, false);
 	print_adj_list(graph);
-	print_dist_pred(graph, 0);
-	print_dist_pred(graph,3);
+	print_dist_pred(graph,0);
 	delete_adj_list(graph);
 	//fibHeap * h = fib_new_heap(graph, 3);
 	/*while (!fib_empty_heap(h)) {

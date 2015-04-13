@@ -276,6 +276,7 @@ void CASCADING_CUT(fibHeap * h, fibNode * y) {
 bool fib_decrease_dist(fibHeap * h, int node, int k) {
 	fibNode * p = NULL;
 	fibNode * x = h->dict[node];
+	printf("nodo %d chive %d \n", x->data, k);
 	if (k > x->key)
 		return false;
 	x->key = k;
