@@ -18,11 +18,6 @@ int main(void)  {
 	print_adj_list(graph);
 	//print_dist_pred(graph,3);
 	//delete_adj_list(graph);
-	heap_in= fib_new_heap(graph,0);
-	SerializeFib(heap_in->min);
-	printf("\n");
-	node_dist_out=fib_extract_min(heap_in);
-	printf("minimo estratto id %d chive %d \n", node_dist_out.node, node_dist_out.dist);
-	SerializeFib(heap_in->min);
+	delete_adj_list(graph);
 	return 0;
 }
