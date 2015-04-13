@@ -74,7 +74,7 @@ bool d_decrease_dist(d_heap* d_heap_in, int node_in,int dist_in){
 
 //true se e solo so l'd_heap è vuoto...in tal caso lo elemina
 
-bool empty_heap(d_heap* d_heap_in){
+bool d_empty_heap(d_heap* d_heap_in){
 	if(d_heap_in->num_nodes>0)return false;
 	free(d_heap_in->nd);
 	free(d_heap_in);
