@@ -17,7 +17,7 @@ dist_pred* dijkstra(adj_list* adj_list_in, int source) {
 	int num_nodes; node_dist node_dist_out; dist_pred* dist_pred_out; heap* heap_in;list* list_in;
 	num_nodes=adj_list_in->num_nodes;
 	dist_pred_out=(dist_pred*)malloc(num_nodes*sizeof(dist_pred));
-	heap_in=new_d_heap(adj_list_in,source);
+	heap_in=new_heap(adj_list_in,source);
 	dist_pred_out[source].pred=source;
 	while(!empty_heap(heap_in)){
 		node_dist_out=extract_min(heap_in);
