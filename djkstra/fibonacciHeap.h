@@ -181,7 +181,7 @@ void CONSOLIDATE(fibHeap *h) {
 			}
 		}
 	}
-
+	free(A);
 }
 // deletes the element from heap H whose key is minimum,
 // returning a pointer to the element.
@@ -314,7 +314,7 @@ fibHeap * fib_new_heap(adj_list* graph,int source) {
 	int key;
 	//inizializzo la lista dei nodi
 	h->numNode=graph->num_nodes;
-	h->dict = (fibNode **) malloc(h->numNode * sizeof(fibNode));
+	h->dict = (fibNode **) malloc(h->numNode * sizeof(fibNode*));
 	for (int i = 0; i < graph->num_nodes; i++) {
 		if(i==source){
 			key=0;
@@ -334,6 +334,7 @@ bool fib_empty_heap(fibHeap * h){
 		for(int i=0; i<h->numNode; i++){
 			free(h->dict[i]);
 		}
+		free(h->dict);
 		return true;
 	}else
 		return false;
