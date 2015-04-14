@@ -1,0 +1,1 @@
+Applicazione distribuita su piattaforma android e java se
